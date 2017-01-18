@@ -18,7 +18,7 @@
 				<h2 class="text-danger">
 					<!-- 显示time图标 -->
 					<span class="glyphicon glyphicon-time"></span>
-					<!-- 展示倒计时 -->
+					<!-- 展示倒计时时间或秒杀结束字样 -->
 					<span class="glyphicon" id="seckill-box"></span>
 				</h2>
 			</div>

@@ -9,7 +9,7 @@ var seckill = {
 		},
 
 		exposer : function(seckillId) {
-			return '/seckill/seckill/' + seckillId + '/exposer';
+			return '/seckill/seckill/'+seckillId+'/exposer';
 		},
 		execution : function(seckillId, md5) {
 			return '/seckill/seckill/' + seckillId + '/' + md5 + '/execute';
@@ -26,25 +26,31 @@ var seckill = {
 	},
 
 	handleSeckill : function(seckillId, node) {
+
 		// 获取秒杀地址，控制显示逻辑，执行秒杀
 		node
 				.hide()
 				.html(
 						'<button class="btn bg-primary btn-lg" id="killBtn">开始秒杀</button>');// 秒杀按钮
 		$.post(seckill.URL.exposer(seckillId), {}, function(result) {
+			console.log("dao exposer");
 			// 在回调函数中执行交互流程
 			if (result && result['success']) {
 				var exposer = result['data'];
-				if (exporser['exposer']) {
+				if (exposer['exposed']) {
 					// 开启秒杀
 					var md5 = exposer['md5'];
 					//获取秒杀地址
                     var killUrl = seckill.URL.execution(seckillId, md5);
+                    console.log("killUrl"+killUrl);
                     //只绑定一次点击事件
                     $('#killBtn').one('click', function(){
+                    	//1.执行秒杀请求
+                    	//2.先禁用按钮
                         $(this).addClass('disabled');
+                        //发送秒杀请求
                         $.post(killUrl, {}, function(result){
-                            if(result && result['seccess']){
+                            if(result && result['success']){
                                 var killResult = result['data'];
                                 var state = killResult['state'];
                                 var stateInfo = killResult['stateInfo'];
@@ -78,7 +84,7 @@ var seckill = {
 			// 秒杀未开始,计时事件绑定
 			// var killTime1 = new Date(startTime+1000);
 			var killTime = Number(startTime);
-			console.log("result444=" + killTime);
+			//console.log("result444=" + killTime);
 			seckillBox.countdown(killTime, function(event) {
 				// 时间格式
 				var format = event.strftime('秒杀倒计时： %D天 %H时 %M分 %S秒');
@@ -90,6 +96,8 @@ var seckill = {
 			});
 
 		} else {
+			
+
 			// 秒杀进行中
 			seckill.handleSeckill(seckillId, seckillBox);
 		}

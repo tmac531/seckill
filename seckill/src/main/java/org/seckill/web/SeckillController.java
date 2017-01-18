@@ -66,7 +66,8 @@ public class SeckillController {
 		return "detail";
 	}
 	
-	@RequestMapping(value="/{seckillId}/exposer",method=RequestMethod.POST,produces={"application/json;charset=UTF-8"})
+	@RequestMapping(value="/{seckillId}/exposer",produces={"application/json;charset=UTF-8"})
+	@ResponseBody
 	public SeckillResult<Exposer> exposer(@PathVariable("seckillId")long seckillId)
 	{
 		SeckillResult<Exposer> result;
@@ -80,10 +81,11 @@ public class SeckillController {
 		
 		return result;
 	}
-	@RequestMapping(value="/{seckillId}/{md5}/exposer",method=RequestMethod.POST,produces={"application/json;charset=UTF-8"})
+	@RequestMapping(value="/{seckillId}/{md5}/execute",method=RequestMethod.POST,produces={"application/json;charset=UTF-8"})
+	@ResponseBody
 	public SeckillResult<SeckillExecution> execute(@PathVariable("seckillId") long seckillId,@CookieValue(value="killPhone",required=false)long userPhone,@PathVariable("md5")String md5)
 	{
-		
+		System.out.println("-=-=-=-=-=-=-=-=-=");
 		if(String.valueOf(userPhone)==null)
 		{
 			return new SeckillResult<SeckillExecution>(false, "Î´×¢²á");
@@ -91,19 +93,20 @@ public class SeckillController {
 		SeckillResult<SeckillExecution> result;
 		try {
 			SeckillExecution execution=seckillService.excuteSeckill(seckillId, userPhone, md5);
+			System.out.println("--------"+execution);
 			return new SeckillResult<SeckillExecution>(true, execution);
 
 		} catch (RepeatKillException e) {
 			SeckillExecution execution=new SeckillExecution(seckillId, SeckillStateEnum.REPEAT_KILL);
-		    return new SeckillResult<SeckillExecution>(false, execution);
+		    return new SeckillResult<SeckillExecution>(true, execution);
 		}catch (SeckillCloseException e) {
 			SeckillExecution execution=new SeckillExecution(seckillId, SeckillStateEnum.END);
-		    return new SeckillResult<SeckillExecution>(false, execution);
+		    return new SeckillResult<SeckillExecution>(true, execution);
 	
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			SeckillExecution execution=new SeckillExecution(seckillId, SeckillStateEnum.INNER_ERROR);
-		    return new SeckillResult<SeckillExecution>(false, execution);
+		    return new SeckillResult<SeckillExecution>(true, execution);
 	
 		}
 			
